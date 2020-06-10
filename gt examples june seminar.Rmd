@@ -1,0 +1,241 @@
+---
+title: "gt examples"
+author: "Alex Thomson - Stats4SD"
+date: "03/06/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE)
+```
+
+```{r}
+library(gt)
+library(tidyverse)
+#setwd("C:/Users/AlexThomson/OneDrive - Statistic For Sustainable Development/June Seminar - tables from R/gt/")
+load("imdb.Rdata")
+CC3_farm <- readRDS("CC3_farm.rds")
+```
+
+
+## IMDB entry tables
+
+### basic table with no formatting
+
+You can create a very basic table by simply calling the `gt()` function and specifying your data frame. You can also pipe the function directly from using dplyr, tidyr etc. to manipulate your data just like you would any other tidyverese package. In the example below the function has even automatically detected that the first column can be used as a group name for rows column in the stub.
+
+Remember that in gt terminology the stub is the row names and the spanner is a name for a group of columns.
+
+```{r basic table with no formatting}
+imdb_animation_avgs <- imdb %>%
+  filter(type != "videoGame")%>%
+  group_by(type, animation)%>%
+  summarise(Mean.Votes = mean(numVotes, na.rm = TRUE),
+            Mean.Rating = mean(averageRating, na.rm = TRUE),
+            Number.Of.Entries = n())
+
+gt(imdb_animation_avgs) # automatically detected row groupings
+```
+
+### include a title and subtitle
+
+You can easily specify a title and subtitle directly unlike when using Flextable. This is done using the `tab_header()` function and then specifying a couple strings for your titles.
+
+```{r basic table with a title and subtitle}
+top_20_movies <- imdb %>%
+  filter(type == "movie" & numVotes > 99999)%>%
+  arrange(desc(averageRating))%>%
+  select(title, year, averageRating, numVotes)%>%
+  slice(1:20)
+
+tab1<-top_20_movies%>%
+  gt()%>%
+  tab_header(title = "Top 20 Movies of all time", # add a title
+             subtitle = "IMDB Entries with at least 100,000 votes") # add a subtitle
+tab1
+```
+
+
+### change column labels and include number formatting
+
+Changing column names works basically in the same way as flextable by writing `variable.name = "new column name"` within the function `cols_label()`. 
+
+There are many formatting functions provided by gt including ones for currencies, dates, times, date-times, etc.
+
+The `fmt_number()` function allows you to edit numeric values. This allows you to set many features including; decimal places, trailing zeros, scaling, suffixing (K(thousand),M(million),B(billion)), separation markers.
+
+```{r table with new column labels and number formatting}
+`random_movies` <- imdb %>%
+  filter(type == "movie" & numVotes > 99999)
+random_movies_5 <- `random_movies`[sample(nrow(`random_movies`), 5),]
+random_movies_5 <- random_movies_5%>%
+  arrange(title)%>%
+  select(title,year,length, numVotes, averageRating, director)
+
+gt(random_movies_5,
+   rowname_col = "title")%>%
+    tab_header(title = md("**5 Movies**"),
+             subtitle = md("IMDB Entries with *at least* 100,000 votes"))%>%
+  cols_label(year = "Year",
+             length = "Length (Minutes)",
+             numVotes = "Total Votes",
+             averageRating = "Rating",
+             director = "Director")%>% # set new column names
+  fmt_number(columns = vars(numVotes), # choose column to format
+             suffixing = TRUE) # add suffixing K = thousand, M = Million etc.
+```
+
+
+### add footnotes and a background colour
+
+Using the `tab_options()` function allows you to set many, many aesthetic characteristics including borders, font, headings, column labels, footnotes, colours etc. If you see the help page for this function you will find a very long list of all the changes you can make using this function. For demonstration I have just showed you that i can set the background colour for the entire table.
+
+You can add footnotes using the `tab_footnote()` function which requires a few arguments including the location of the footnote (i.e. in cells, the stub or the header) and to which column/row should it be applied to. You can set these conditionally such as setting the footnote to apply to the row in a column where the column is at its minimum. You can use the `tab_options()` to also set the appearance of the footnote itself including font size, padding, separation markers and what marks should be used for the footnotes (numbers, alphabet etc.)
+
+Similarly you can also add a source for your data using `source_note()`.
+
+```{r table with footnotes and background}
+tab1 <- imdb %>%
+  filter(type == "movie" & numVotes > 99999)%>%
+  arrange(desc(averageRating))%>%
+  select(title, year, averageRating, numVotes)%>%
+  slice(1:20)%>%
+  gt()%>% # can directly pipe on from other  functions
+    cols_label(title = "Movie",
+             year = "Year of Release",
+             averageRating = "Average Rating",
+             numVotes = "Number of Votes")%>%
+  tab_header(title = md("**Top 20 Movies of all time**"), # can use markdown notation to make text bold or italic
+             subtitle = md("IMDB Entries with *at least* 100,000 votes"))%>%
+  tab_source_note( #create a source note for data
+    source_note = "Source : https://www.imdb.com/search/title/?count=100&groups=top_1000&sort=user_rating (2020)" # add source
+  )%>% 
+  tab_footnote(
+    footnote = "Christopher Nolan Films",
+    locations = cells_body( # set where this footnote applies (see help for where as can go basically anywhere in the table)
+      columns = vars(title), #column it applies to
+      rows = c(4,14) # row it applies to
+    ) # create a footnote
+    )%>%
+  tab_footnote(
+    footnote = "Peter Jackson Films",
+    locations = cells_body(
+      columns = vars(title),
+      rows = c(9,12,19)
+    )
+    
+  )%>%
+  fmt_number(columns = vars(numVotes),
+             suffixing = TRUE)%>% # format numeric columns
+    tab_footnote(
+    footnote = "Least Voted film",
+    locations = cells_body(
+      columns = vars(numVotes),
+      rows = numVotes == min(numVotes)
+    )
+    )%>%
+  tab_options(table.background.color = "blue") #change many many options about the appearance of the table including colours
+
+tab1
+```
+
+## Cotton Connect example
+
+The cotton connect example shown in the seminar works similarly to the flextable example in that a column of group names was required on which the data could be grouped by. However rather than needing a separate function to do the grouping, instead you can specify the `gropname_col = x` within the call to `gt()`.
+
+```{r data setup, echo = FALSE}
+# Data set up can ignore
+  X<-CC3_farm%>%
+    dplyr::group_by(PartnerCode)%>%
+    dplyr::summarise("Mean (Farm)" = round(mean(acre, na.rm = TRUE),2),
+                     "Median (Farm)" = round(median(acre, na.rm = TRUE),2),
+                     "Mean (Cottton)" = round(mean(cottonacre, na.rm = TRUE),2),
+                     "Median (Cotton)" = round(median(cottonacre, na.rm = TRUE),2),
+                     "Mean (%Cotton)" = round(mean(cottonprop, na.rm = TRUE),3)*100,
+                     "Median (%Cotton)" = round(median(cottonprop, na.rm = TRUE),3)*100,
+                     "N" = n())%>%
+    dplyr::rename("Sub-group" = PartnerCode)
+  
+  
+  Y<-CC3_farm%>%
+    dplyr::group_by(State)%>%
+    dplyr::summarise("Mean (Farm)" = round(mean(acre, na.rm = TRUE),2),
+                     "Median (Farm)" = round(median(acre, na.rm = TRUE),2),
+                     "Mean (Cottton)" = round(mean(cottonacre, na.rm = TRUE),2),
+                     "Median (Cotton)" = round(median(cottonacre, na.rm = TRUE),2),
+                     "Mean (%Cotton)" = round(mean(cottonprop, na.rm = TRUE),3)*100,
+                     "Median (%Cotton)" = round(median(cottonprop, na.rm = TRUE),3)*100,
+                     "N" = n())%>%
+    dplyr::rename("Sub-group" = State)
+  
+  
+  
+  Z<-CC3_farm%>%
+    dplyr::mutate(Total = "Total")%>%
+    dplyr::group_by(Total)%>%
+    dplyr::summarise("Mean (Farm)" = round(mean(acre, na.rm = TRUE),2),
+                     "Median (Farm)" = round(median(acre, na.rm = TRUE),2),
+                     "Mean (Cottton)" = round(mean(cottonacre, na.rm = TRUE),2),
+                     "Median (Cotton)" = round(median(cottonacre, na.rm = TRUE),2),
+                     "Mean (%Cotton)" = round(mean(cottonprop, na.rm = TRUE),3)*100,
+                     "Median (%Cotton)" = round(median(cottonprop, na.rm = TRUE),3)*100,
+                     "N" = n())%>%
+    dplyr::rename("Sub-group" = Total)
+  A<-rbind(Y,X,Z)
+    A<-rbind(Y,X,Z)
+  A$Group <- c(rep("State", 4), rep("Partner", 7), "Overall")
+  A <- select(A, Group, `Sub-group`:N)
+```
+
+```{r cotton connect table}
+tab1 <- gt(A, groupname_col = "Group")%>% # create table object and set groupnames for rows
+  cols_label(`Sub-group` = "Sub-group",
+              `Mean (Farm)` = "Farm Area (Mean)",
+              `Median (Farm)` = "Farm Area (Median)",
+              `Mean (Cottton)` = "Cotton Area (Mean)",
+              `Median (Cotton)` = "Cotton Area (Median)",
+             `Mean (%Cotton)` = "Cotton Area as % of Farm Area (Mean)",
+             `Median (%Cotton)` = "Cotton Area as % of Farm Area (Median)",
+             N = "N")%>% #set column names
+  tab_header("Farm Area (Acre), Cotton Area (Acre), Cotton Area as % of Farm Area") #create a table header
+
+tab1
+```
+
+## Modelling Examples
+
+You can also use the gt package in tandem with the broom package to create nicer looking outputs for model tables. You can use the `fmt_number()` function to edit how numerical values for your model features will appear and alternatively for very large or very small numbers, you can convert them to scientific notation using `fmt_scientific()`. Finally you can set a string for missing values using the `fmt_missing()` function, such as setting an empty string to appear rather than "NA"
+
+```{r}
+movies <- imdb%>%
+  filter(type == "movie")%>%
+  mutate(num_Votes_10000 = numVotes/10000)
+
+model1 <- aov(averageRating ~ length + num_Votes_10000 + animation, movies)
+
+m1 <- broom::tidy(model1)
+
+gt(m1)%>%
+  fmt_number(columns = c(3:4),
+             suffixing = T)%>%
+  fmt_number(columns = 5,
+             decimals = 1,
+             )%>%
+  fmt_scientific(columns = 6,
+                 decimals = 2)%>%
+  fmt_missing(columns = 5:6,
+              missing_text = "")
+```
+
+```{r}
+lm(averageRating ~ length + num_Votes_10000 + animation, movies) %>%
+  broom::tidy()%>%
+  gt()%>%
+  fmt_number(columns = 2:3,
+             decimals = 3)%>%
+  fmt_number(columns = 4,
+             decimals = 1)%>%
+  fmt_scientific(columns = 5,
+                 decimals = 2)
+```
