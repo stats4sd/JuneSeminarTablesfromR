@@ -17,8 +17,6 @@ library(officedown)
 library(officer)
 library(flextable)
 library(tidyverse)
-library(jpeg)
-library(png)
 #setwd("C:/Users/AlexThomson/OneDrive - Statistic For Sustainable Development/June Seminar - tables from R/flextable/examples/")
 load("imdb.Rdata")
 random_movies <- readRDS("random_movies.rds")
@@ -44,9 +42,9 @@ t
 
 ### Include a title and a subtitle
 
-Adding a title and subtitle requires a little bit of logic to remember. unfortunately you can't just add them directly like other packages. They are both added by using `add_header_lines` function for which you just need to specify text. However, you want to add the subtitle first as the header line always goes to the very top so you need to start at the bottom of the header and work upwards.
+Adding a title and subtitle requires a little bit of logic to remember. unfortunately you can't just add them directly like other packages. They are both added by using `add_header_lines` function for which you just need to specify text. However, you want to add the subtitle first as the header line always goes to the very top so you need to start at the bottom of the header and work upwards. 
 
-In this example we have also changed the font size of the main title to make it stand out from the subtitle. In flextable notation `i` means row numbers or names and `j` means column names or numbers. You also want to specify the part of the table as the rows and columns within the header, the body of the table and the footer are treated separately. So in this case the title is row 1 of the header.
+In this example we have also changed the font size of the main title to make it stand out from the subtitle. In flextable notation `i` means row numbers or names and `j` means column names or numbers. You also want to specify the part of the table as the rows and columns within the header, the body of the table and the footer are treated separately. So in this case the title is row 1 of the header. 
 
 ```{r}
 top_20_movies <- imdb %>%
@@ -59,25 +57,25 @@ top_20_movies <- imdb %>%
 t <- flextable(top_20_movies)
 t <- add_header_lines(t, values = "IMDB Entries with at least 100,000 votes") # add subtitle
 t <- add_header_lines(t, values = "Top 20 Movies of all time") # add title
-t <- fontsize(t, i = 1, size = 14, part = "header") #increase text size of the title
+t <- fontsize(t, i = 1, size = 14, part = "header") #increase text size of the title 
 t <- autofit(t) # autofit the width of the table and columns
 t
 ```
 
 ### change column labels and include number formatting
 
-Changing the labels of columns is quite simple and takes the same format as the `rename` function from dplyr. You simply write `variable.name  = "new column name"`.
+Changing the labels of columns is quite simple and takes the same format as the `rename` function from dplyr. You simply write `variable.name  = "new column name"`. 
 
 You can set the formatting of a numeric column using `colformat_num` by specifying the column you wish to format (`j = 4` in this example). You can then set the number of decimal places, the big mark, a string for missing values, and also add any prefixing or suffixing if you wish to specify the units directly.
 
 ```{r}
 t <- flextable(top_20_movies)
-t <- set_header_labels(t,
+t <- set_header_labels(t, 
                        title = "Movie",
                        year = "Year Released",
                        averageRating = "Rating",
                        numVotes = "Total Votes") # written in same fashion as dplyr::rename (variable.name = "new column name")
-t <- colformat_num(t,
+t <- colformat_num(t, 
                    j = 4, # column number 4
                    digits = 0, # no decimal places
                    big.mark = ",") # use comas when dealing with large numbers
@@ -112,58 +110,7 @@ There are many special features of FlexTable that may not be necessarily needed 
 
 Most of this revolves around the `compose()` function when used in combination with `as_paragraph()`. This allows you to manually edit text within the table as well as change who the data is visualised including by adding mini bars, line ranges and even adding image files.
 
-
 ```{r}
-
-######################
-# Image Processing
-######################
-# flextable::as_image() lets us to specify a height and width for each image. If you don't specify, you get a default of width = 0.5, height = 0.2 (inches). So, unless you have an image with dimensions of that exact ratio, this will stretch your image unnaturally and ruin your beautifully designed table.
-# We can fix this by getting the actual width/height ratio of our images to pass into the flextable::as_image() function.
-
-#import images
-images <- list(
-    readJPEG("directors/jon favreau.jpg"),
-    readJPEG("directors/joel schumacher.jpg"),
-    readJPEG("directors/Jay_Roach.jpg"),
-    readPNG("directors/Gabor_Csupo.png"),
-    readJPEG("directors/Ryan_Coogler.jpg"),
-    readJPEG("directors/Alex_Proyas.jpg"),
-    readJPEG("directors/Todd_Phillips.jpg"),
-    readJPEG("directors/Terry_Gilliam.jpg"),
-    readJPEG("directors/Guillermo-del-Toro-2017.jpg"),
-    readJPEG("directors/Eric_Brevig.jpg"),
-    readJPEG("directors/JUDDPORTRAIT.jpg"),
-    readJPEG("directors/220px-Dan_Scanlon.jpg"),
-    readPNG("directors/Nicolas.png"),
-    readJPEG("directors/Wes_Craven.jpg"),
-    readJPEG("directors/Nancy_Meyers.jpg"),
-    readJPEG("directors/Phillip_Noyce.jpg"),
-    readJPEG("directors/Edward_Zwick.jpg"),
-    readJPEG("directors/Iain_Softley.jpg")
-)
-
-widths = list()
-
-# Set the height you want each image to be (in inches).
-uniform_height <- 0.8
-
-for (i in 1:length(images)) {
-    ## dim(img) gives you the height / width / channels, in that order. (channels = e.g. RGB)
-    height <- dim(images[[i]])[1]
-    width <- dim(images[[i]])[2]
-
-    # we only care about the ratio
-    widths[[i]] <- (width/height)*uniform_height
-
-    ## if you want to set a consistent width instead, set a uniform_width and reverse the ratio calculation:
-    # heights[[i]] <- (height/width)*uniform_width
-}
-
-######################
-# FlexTable Stuff
-######################
-
 border_h = fp_border(color="blue")
 
 t <- flextable(random_movies,
@@ -195,77 +142,77 @@ t <- flextable::compose(t,
 t <- flextable::compose(t,
              i = ~ title == "Chef", # can conditionally set columns and row indexes as well e.g. row where title == "Chef"
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/jon favreau.jpg", width = widths[[1]], height = uniform_height))) # additionally specify as_image
+            value = as_paragraph(flextable::as_image(src = "directors/jon favreau.jpg", width = 2, height = 2))) # additionally specify as_image
 # provide a file link to the image
 # set width and height of the image
 t <- flextable::compose(t,
-             i = c(1,8),
+             i = c(1,8), 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/joel schumacher.jpg", width = widths[[2]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/joel schumacher.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 2,
+             i = 2, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Jay_Roach.jpg", width = widths[[3]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Jay_Roach.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 3,
+             i = 3, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Gabor_Csupo.png", width = widths[[4]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Gabor_Csupo.png", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 5,
+             i = 5, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Ryan_Coogler.jpg", width = widths[[5]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Ryan_Coogler.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 6,
+             i = 6, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Alex_Proyas.jpg", width = widths[[6]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Alex_Proyas.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 7,
+             i = 7, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Todd_Phillips.jpg", width = widths[[7]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Todd_Phillips.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 9,
+             i = 9, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Terry_Gilliam.jpg", width = widths[[8]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Terry_Gilliam.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = c(10, 15),
+             i = c(10, 15), 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Guillermo-del-Toro-2017.jpg", width = widths[[9]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Guillermo-del-Toro-2017.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 11,
+             i = 11, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Eric_Brevig.jpg", width = widths[[10]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Eric_Brevig.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 12,
+             i = 12, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/JUDDPORTRAIT.jpg", width = widths[[11]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/JUDDPORTRAIT.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 13,
+             i = 13, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/220px-Dan_Scanlon.jpg", width = widths[[12]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/220px-Dan_Scanlon.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 14,
+             i = 14, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Nicolas.png", width = widths[[13]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Nicolas.png", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 16,
+             i = 16, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Wes_Craven.jpg", width = widths[[14]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Wes_Craven.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 17,
+             i = 17, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Nancy_Meyers.jpg", width = widths[[15]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Nancy_Meyers.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 18,
+             i = 18, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Phillip_Noyce.jpg", width = widths[[16]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Phillip_Noyce.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 19,
+             i = 19, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Edward_Zwick.jpg", width = widths[[17]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Edward_Zwick.jpg", width = 2, height = 2)))
 t <- flextable::compose(t,
-             i = 20,
+             i = 20, 
              j = 6,
-            value = as_paragraph(flextable::as_image(src = "directors/Iain_Softley.jpg", width = widths[[18]], height = uniform_height)))
+            value = as_paragraph(flextable::as_image(src = "directors/Iain_Softley.jpg", width = 2, height = 2)))
 
 t <- width(t, width = 2) # manually set column width
 
@@ -293,8 +240,8 @@ CC3_farm <- CC3_farm <- readRDS("CC3_farm.rds")
                      "Median (%Cotton)" = round(median(cottonprop, na.rm = TRUE),3)*100,
                      "N" = n())%>%
     dplyr::rename("Sub-group" = PartnerCode)
-
-
+  
+  
   Y<-CC3_farm%>%
     dplyr::group_by(State)%>%
     dplyr::summarise("Mean (Farm)" = round(mean(acre, na.rm = TRUE),2),
@@ -305,7 +252,9 @@ CC3_farm <- CC3_farm <- readRDS("CC3_farm.rds")
                      "Median (%Cotton)" = round(median(cottonprop, na.rm = TRUE),3)*100,
                      "N" = n())%>%
     dplyr::rename("Sub-group" = State)
-
+  
+  
+  
   Z<-CC3_farm%>%
     dplyr::mutate(Total = "Total")%>%
     dplyr::group_by(Total)%>%
@@ -322,22 +271,22 @@ CC3_farm <- CC3_farm <- readRDS("CC3_farm.rds")
   A <- select(A, Group, `Sub-group`:N)
 ```
 
-```{r}
+```{r}  
   A <- as_grouped_data(x = A,
                        groups = c("Group")) # group our data on the Group column
 
   A[is.na(A)] = " " #repalce NAs with an emmpty string
-
+  
   border_h = fp_border(color="gray") # create a border object
-
+  
   t<-flextable(A)
-  t<-set_header_labels(t, values = list(Group = "Group",
+  t<-set_header_labels(t, values = list(Group = "Group", 
                                        `Sub-Group` = "Sub-group",
-                                       `Mean (Farm` = str_wrap("Farm Area (Mean)",7),
+                                       `Mean (Farm` = str_wrap("Farm Area (Mean)",7), 
                                        `Median (Farm)` = str_wrap("Farm Area (Median)",7),
                                       `Mean (Cottton)` = str_wrap("Cotton Area (Mean)",7),
                                     `Median (Cotton)` = str_wrap("Cotton Area (Median)",7),
-                                    `Mean (%Cotton)` = str_wrap("Cotton Area as % of Farm Area (Mean)",12),
+                                    `Mean (%Cotton)` = str_wrap("Cotton Area as % of Farm Area (Mean)",12), 
                                     `Median (%Cotton)` = str_wrap("Cotton Area as % of Farm Area (Median)",12),
                                     N = "N"))
   t<-fontsize(t, size = 9, part = "all")
@@ -345,14 +294,14 @@ CC3_farm <- CC3_farm <- readRDS("CC3_farm.rds")
   t<-add_header_lines(t, values = "Farm Area (Acre), Cotton Area (Acre), Cotton Area as % of Farm Area")
   t <- border_inner_h(t, part="body", border = border_h )
   t
-```
+```  
 
 ### Modelling Examples
 
 It is additionally not too difficult to create modelling tables using flextable. You could combine it with the very useful function `tidy()` from the broom packages which turns model summaries into a convenient tidy data fame that can be used as a table. This tidy function can be used for numerous different types of statistical models.
 
 Additionally however, with any glm, lm and some statistical tests you can directly pipe in the `as_flextable()` function and this will automatically create a model table that includes significance codes and footnotes on various model characteristics such as the R-squared and F-statistic.
-
+ 
 ```{r}
 movies <- imdb%>%
   filter(type == "movie")%>%
@@ -371,7 +320,7 @@ t <- set_header_labels(t, values = list(
   statistic = "F - Statistic",
   p.value = "P.Value"
 ))
-t <- colformat_num(t, j = c(3:6), digits = 2, na_str = " ")
+t <- colformat_double(t, j = c(3:6), digits = 2, na_str = " ")
 t <- autofit(t)
 t
 ```
