@@ -7,6 +7,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
                       message = FALSE)
 ```
 
@@ -204,8 +206,6 @@ tab1
 ```
 
 ## Modelling Examples
-
-You can also use the gt package in tandem with the broom package to create nicer looking outputs for model tables. You can use the `fmt_number()` function to edit how numerical values for your model features will appear and alternatively for very large or very small numbers, you can convert them to scientific notation using `fmt_scientific()`. Finally you can set a string for missing values using the `fmt_missing()` function, such as setting an empty string to appear rather than "NA"
 
 ```{r}
 movies <- imdb%>%
