@@ -142,9 +142,9 @@ tab1 <- imdb %>%
 tab1
 ```
 
-## Cotton Connect example
+## Cotton Farming example
 
-The cotton connect example shown in the seminar works similarly to the flextable example in that a column of group names was required on which the data could be grouped by. However rather than needing a separate function to do the grouping, instead you can specify the `gropname_col = x` within the call to `gt()`.
+The cotton farming example shown in the seminar works similarly to the flextable example in that a column of group names was required on which the data could be grouped by. However rather than needing a separate function to do the grouping, instead you can specify the `gropname_col = x` within the call to `gt()`.
 
 ```{r data setup, echo = FALSE}
 # Data set up can ignore

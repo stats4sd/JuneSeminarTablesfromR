@@ -138,9 +138,9 @@ kable(top_100_movies,
   scroll_box(width = "500px", height = "400px") # specify size of the scroll box
 ```
 
-## Cotton Connect Example
+## Cotton Farming example
 
-The cotton connect example shown within the seminar is fairly straightforward in comparison to the other packages despite kable being a more technical option. This is partly due to us being able to manually create our row groupings using `pack_rows()` rather than requiring an existing grouping column. Therefore in this case we did not need to create an additional column beforehand or use an additional function to directly group the data before we even made a table. 
+The cotton farming example shown within the seminar is fairly straightforward in comparison to the other packages despite kable being a more technical option. This is partly due to us being able to manually create our row groupings using `pack_rows()` rather than requiring an existing grouping column. Therefore in this case we did not need to create an additional column beforehand or use an additional function to directly group the data before we even made a table. 
 
 This function requires you to provide a kable for the grouping and then to specify the first and last rows within this new grouping.
 

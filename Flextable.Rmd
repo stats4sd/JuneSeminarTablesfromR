@@ -222,9 +222,9 @@ t
 ```
 
 
-### Cotton Connect Example
+### Cotton Farming example
 
-The cotton connect example shown in the seminar showed off how to group rows together with a title for this sub group. This can be done so long as you have a column in your data frame which defines these groups. You can then sue the `as_grouped_data()` function before you create a flextable to set up this grouped data structure which will then create these groupings within the data frame. Think of it like the `group_by` function in dplyr but much more visual. If you look at your data frame after running this function you will see what it does exactly.
+The cotton farming example shown in the seminar showed off how to group rows together with a title for this sub group. This can be done so long as you have a column in your data frame which defines these groups. You can then sue the `as_grouped_data()` function before you create a flextable to set up this grouped data structure which will then create these groupings within the data frame. Think of it like the `group_by` function in dplyr but much more visual. If you look at your data frame after running this function you will see what it does exactly.
 
 ```{r, echo = FALSE}
 #DATA SET UP CAN IGNORE
